@@ -113,6 +113,13 @@ export default class Presentation extends React.Component {
           bgImage={images.peggy}
           align="center flex-start"
         >
+          <Notes>
+            <p>
+              My name is Peggy Rayzis and I am super excited to be here today.
+              When I'm not coding, you can find me on the ski slopes. Here's a
+              picture of me last winter from Kicking Horse in British Columbia.
+            </p>
+          </Notes>
           <Text
             margin="50px"
             bold
@@ -164,8 +171,8 @@ export default class Presentation extends React.Component {
                 How are we managing data with Redux? If you've used it before,
                 you know that Redux doesn't support making network requests out
                 of the box. You have to download one of these three libraries
-                and learn their approach to creating async actions before you
-                can fetch any remote data.
+                and learn their approach to async control flow in Redux before
+                you can fetch any remote data.
               </p>
             </Notes>
             <Title>redux-saga</Title>
@@ -778,13 +785,27 @@ export default class Presentation extends React.Component {
         </Slide>
         <Slide {...slideProps} bgColor="tertiary">
           <Notes>
-            <p>blah</p>
+            <p>
+              Perhaps the most creative application of links yet is our newest
+              release apollo-link-state, which allows you to manage your local
+              data with Apollo Client and query it with GraphQL. link-state is
+              truly pushing the boundaries of GraphQL outside the context of the
+              server.
+            </p>
           </Notes>
           <Title>apollo-link-state 🎉</Title>
         </Slide>
         <Slide {...slideProps}>
           <Notes>
-            <p>blah</p>
+            <p>
+              For you to understand just how noteworthy apollo-link-state is, we
+              first must look at Apollo's past. Historically, users put all of
+              their remote data into Apollo Client. This equated to about 80% of
+              their data, but what about the other 20% for things like boolean
+              flags, device API results. For that local data, users maintained a
+              separate Redux store. Keeping this store in sync became tricky,
+              especially as Apollo Client 2.0 moved off of Redux.
+            </p>
           </Notes>
           <Title textSize={textSize.small}>
             2017: Separate stores, no cohesion
@@ -793,7 +814,17 @@ export default class Presentation extends React.Component {
         </Slide>
         <Slide {...slideProps}>
           <Notes>
-            <p>blah</p>
+            <p>
+              With state link, we now have the ability to query all of our
+              application's local and remote data with GraphQL. This has several
+              advantages - first, GraphQL becomes a unified interface for all of
+              our data. Since React only knows about Apollo, theoretically we
+              can add multiple data sources to that link chain (maybe an Apollo
+              link webworker) and be able to query it all with GraphQL. Also,
+              the Apollo cache becomes our single source of truth. No more
+              managing a separate store - now you can manage your local data the
+              same way you manage your remote data.
+            </p>
           </Notes>
           <Title textSize={textSize.small}>
             2018: One unified interface for all data
@@ -802,7 +833,23 @@ export default class Presentation extends React.Component {
         </Slide>
         <Slide {...slideProps}>
           <Notes>
-            <p>blah</p>
+            <p>
+              Here's how you set up a simple client-side resolver with state
+              link. First state link will receive any defaults that you would
+              like to write to the cache as your initial state. Then, you pass
+              in the Apollo cache itself. You'll also pass in a resolver map. If
+              you've worked with graphql-tools before, this API will seem very
+              familiar. The only different here is that the cache is
+              automatically added to the context so you can read and write data
+              to it. Mutations can either return null since all GraphQL types
+              are nullable by default or they can return data.
+              <br />
+              <br />
+              Let's dive a little deeper into some of the fundamental concepts
+              of Apollo and how it relates to what you are currently doing in
+              Redux. Apollo Client 1.0 was built on top of Redux, so you can
+              find common threads between the two.
+            </p>
           </Notes>
           <CodePane
             padding="0px"
@@ -820,6 +867,20 @@ export default class Presentation extends React.Component {
           </Slide>
         </Magic>
         <Slide {...slideProps}>
+          <Notes>
+            <p>
+              With GraphQL, you can think of all your application's data as a
+              big graph with multiple paths to access the same data. Just like
+              we saw earlier in the normalization example, this is why we
+              normalize your data graph before storing it in the Apollo cache. A
+              huge advantage of GraphQL is that you no longer have to write your
+              own selectors with reselect. GraphQL queries and mutations become
+              the standardized way to select your data. Due to the normalization
+              process, this makes it easy to attach a client-only property to
+              server data while still maintaining separate entities in the
+              cache. We'll see an example of how to accomplish that soon.
+            </p>
+          </Notes>
           <List
             style={{
               display: 'inline-block',
@@ -855,7 +916,11 @@ export default class Presentation extends React.Component {
         </Magic>
         <Slide {...slideProps}>
           <Notes>
-            <p>blah</p>
+            <p>
+              we've all been here before. in order to execute one network
+              request in redux, you need to keep track of three actions. one for
+              loading state, errors, and the result.
+            </p>
           </Notes>
           <Title textSize="3.2em">3 actions, 1 request 😐</Title>
           <CodePane
@@ -867,7 +932,11 @@ export default class Presentation extends React.Component {
         </Slide>
         <Slide {...slideProps}>
           <Notes>
-            <p>blah</p>
+            <p>
+              Why write all of that boilerplate when you can just write one
+              query to do the same job? Aside from that, GraphQL is also a very
+              declarative way to describe state changes in your app.
+            </p>
           </Notes>
           <Title textSize="3.2em">Write queries, not code</Title>
           <CodePane
@@ -879,7 +948,12 @@ export default class Presentation extends React.Component {
         </Slide>
         <Slide {...slideProps}>
           <Notes>
-            <p>blah</p>
+            <p>
+              To fetch that query's data, we first need to bind it to our React
+              component. From there, Apollo Client will keep track of loading
+              and error state for us. Once the result returns, we'll
+              automatically get the data back on our data prop.
+            </p>
           </Notes>
           <CodePane
             padding="0px"
@@ -890,7 +964,13 @@ export default class Presentation extends React.Component {
         </Slide>
         <Slide {...slideProps} padding="0px">
           <Notes>
-            <p>blah</p>
+            <p>
+              If you want to get even more granular, Apollo Client can track
+              multiple different kinds of loading states. For example, what do
+              you do if you're refetching a query but there's already data on
+              the page? The networkStatus will inform you of every status change
+              along the way so you can update your UI appropriately.
+            </p>
           </Notes>
           <Title textSize="3.2em">Track all loading states</Title>
           <Image src={images.loading} height="600px" />
@@ -905,6 +985,18 @@ export default class Presentation extends React.Component {
           </Slide>
         </Magic>
         <Slide {...slideProps}>
+          <Notes>
+            <p>
+              The API you use to create resolvers on the server is the exact
+              same API you use to create resolvers on the client with link
+              state. Another cool feature is that async resolvers are supported
+              out of the box, so you can query asynchronous device APIs on the
+              client without having to set up a complicated control flow like
+              Redux sagas. You can also return values from mutations, but you
+              don't have to. This can be useful if you're creating a todo and
+              want to get back the new todo's id for example.
+            </p>
+          </Notes>
           <List
             style={{
               display: 'inline-block',
@@ -932,7 +1024,10 @@ export default class Presentation extends React.Component {
         </Slide>
         <Slide {...slideProps}>
           <Notes>
-            <p>blah</p>
+            <p>
+              Here's what this looks like on the client. When you manage state
+              in Apollo, your cache becomes your single source of truth.
+            </p>
           </Notes>
           <Title textSize={textSize.extraSmall}>
             The Apollo cache is your single source of truth
@@ -946,7 +1041,11 @@ export default class Presentation extends React.Component {
         </Slide>
         <Slide {...slideProps} bgColor="tertiary">
           <Notes>
-            <p>blah</p>
+            <p>
+              This is a huge advantage to using GraphQL. GraphQL doesn't care
+              about where you get your data from. This allows us to use
+              directives to combine local and server data in one query.
+            </p>
           </Notes>
           <Title>
             With Apollo, you can combine local and server data in one query!
@@ -954,7 +1053,14 @@ export default class Presentation extends React.Component {
         </Slide>
         <Slide {...slideProps}>
           <Notes>
-            <p>blah</p>
+            <p>
+              When we trigger a mutation from our UI, Apollo’s network stack
+              needs to know whether to update the data on the client or the
+              server. apollo-link-state uses an @client directive to specify
+              client-only fields. Then, apollo-link-state calls the resolvers
+              for those fields. We can use this to append client-only data to
+              our server data just by writing a resolver for list > isSelected.
+            </p>
           </Notes>
           <Title textSize={textSize.small}>
             @client directive specifies client fields
@@ -968,7 +1074,13 @@ export default class Presentation extends React.Component {
         </Slide>
         <Slide {...slideProps} bgColor="primary">
           <Notes>
-            <p>blah</p>
+            <p>
+              I love this quote from Scott Tolinski about switching to Link
+              State. He just did an episode of Syntax fm with Wes Bos where they
+              talked about their first impressions with link state. I'll be
+              posting links to all the references I discussed in my talk today
+              on Github, so be sure to check it out.
+            </p>
           </Notes>
           <BlockQuote>
             <Quote
@@ -992,13 +1104,27 @@ export default class Presentation extends React.Component {
         </Slide>
         <Slide {...slideProps} bgColor="tertiary">
           <Notes>
-            <p>blah</p>
+            <p>
+              Our goal at Apollo is to make GraphQL easy to use and accessible
+              for everyone. A common misconception is that you need a GraphQL
+              server to take advantage of Apollo. Up until very recently, this
+              was true.
+            </p>
           </Notes>
           <Title>We want to make GraphQL accessible to everyone.</Title>
         </Slide>
         <Slide {...slideProps}>
           <Notes>
-            <p>blah</p>
+            <p>
+              To help more people get started with GraphQL faster, we worked
+              with our awesome contributors Victor & Frederic to release
+              apollo-link-rest. Apollo Link REST allows you to query your REST
+              endpoints with GraphQL. This is great for teams that dont control
+              their backend or for people who just want to experiment with
+              GraphQL before committing to the server. It works similarly to
+              state-link, to specify a rest field, just use the rest directive
+              and pass in the path.
+            </p>
           </Notes>
           <Title textColor="tertiary">apollo-link-rest</Title>
           <CodePane
@@ -1012,6 +1138,14 @@ export default class Presentation extends React.Component {
           </Title>
         </Slide>
         <Slide {...slideProps}>
+          <Notes>
+            <p>
+              Our hope is that you eventually build a GraphQL server of your own
+              to take advantage of GraphQL's benefits beyond ease of querying.
+              It's easier to share across teams because you're Not duplicating
+              all of this effort in every client-side app
+            </p>
+          </Notes>
           <Title textColor="tertiary">
             Benefits of a GraphQL server vs. REST link
           </Title>
@@ -1031,13 +1165,25 @@ export default class Presentation extends React.Component {
         </Slide>
         <Slide {...slideProps} bgColor="tertiary">
           <Notes>
-            <p>blah</p>
+            <p>
+              I'm super excited to share with you some of the more experimental
+              things we're working on. Who's ready? Awesome!
+            </p>
           </Notes>
           <Title>What's next 🚀</Title>
         </Slide>
         <Slide {...slideProps}>
           <Notes>
-            <p>blah</p>
+            <p>
+              You probably noticed I didn't mention client-side schemas at all
+              when talking about state-link. That's because they are a tricky
+              problem to solve. Since the graphql modules for validating a
+              schema are extremely large, we can't just include them the way we
+              would on the server. Just this week, we got a working prototype of
+              the client-side schema working. While this schema does not perform
+              type validation, it does allow you to write a schema in schema
+              definition language and perform introspection against its AST.
+            </p>
           </Notes>
           <Title textSize={textSize.small} textColor="tertiary">
             Client-side schemas
@@ -1049,8 +1195,55 @@ export default class Presentation extends React.Component {
             source={code.typeDefs}
           />
         </Slide>
-        <Slide {...slideProps} bgImage={images.introspection} />
+        <Slide {...slideProps} bgImage={images.introspection}>
+          <Notes>
+            <p>
+              If we can perform introspection against a client-side schema, then
+              we can integrate our client-side schema into our tooling!! My
+              coworker James Baxley has been hard at work w/ improvements to the
+              Apollo DevTools. Just yesterday, we got a working prototype of
+              client-side schema introspection stitched alongside our remote
+              schema. This is huge! Now you can inspect your remote APIs
+              alongside your client data without ever having to leave the
+              devtools. This also brings a whole host of other features, such as
+              autocomplete when running queries in GraphiQL and the ability to
+              perform tracing analysis on our data. Right now, this feature is
+              in alpha but we're hoping to release it very soon.
+              <br />
+              <br />
+              If we can stitch together a client-schema with our remote-schema,
+              we can stitch together anything. Imagine being able to explore
+              your Gatsby schema for static data alongside your dynamic client
+              data. GraphQL becomes a unified interface for accessing all of the
+              data that flows through your application.
+            </p>
+          </Notes>
+        </Slide>
         <Slide {...slideProps}>
+          <Notes>
+            <p>
+              Now that we have the ability to stitch together the schemas for
+              multiple data sources, we'll be able to integrate introspection
+              into a variety of different tools. The most obvious case is dev
+              tools, but we also have a VS Code plugin in the works that will
+              feature autocomplete as youre typing out your queries in your
+              editor. We can also integrate our client data into Apollo Engine
+              to analyze performance and tracing data. With GraphQL as our
+              unified interface to all of our data, our tooling suddenly becomes
+              more cohesive and unified across the stack. This is not only great
+              for developer productivity, but it is the key in my opinion to
+              reducing configuration fatigue. With GraphQL, you can teach
+              someone how to build a resolver once and they'll automatically be
+              able to apply their knowledge across the stack for both local and
+              remote data.
+              <br />
+              <br />
+              This is all so fresh and new, but I think we're on the cusp of
+              something really exciting here that's revolutionizing how we
+              interact with data in our React apps. I can't wait to see what the
+              future holds for Apollo & GraphQL.
+            </p>
+          </Notes>
           <Title>
             Soon, all of your tooling will be unified across the stack.
           </Title>
